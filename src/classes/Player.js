@@ -3,9 +3,9 @@ import Projectile from "./Projectile.js";
 
 class Player {
     constructor(canvasWidth, canvasHeight) {
-        this.width = 48 * 7; // altura
-        this.height = 48 * 7; // largura // this ja instacia a variavel dentro do metodo
-        this.velocity = 12;
+        this.width = 48 * 3; // altura
+        this.height = 48 * 3; // largura // this ja instacia a variavel dentro do metodo
+        this.velocity = 8;
 
         this.position = {
             x: canvasWidth / 2 - this.width / 2,
