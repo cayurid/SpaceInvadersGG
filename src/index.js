@@ -1,8 +1,10 @@
 import Grid from "./classes/Grid.js";
-import Invader from "./classes/invader.js";
+import Invader from "./classes/Invader.js";
+import Obstacle from "./classes/Obstacle.js";
 import Particle from "./classes/particle.js";
 import Player from "./classes/Player.js";
 import Projectile from "./classes/Projectile.js";
+import { GameState } from "./utils/constanst.js";
 
 
 const canvas = document.querySelector("canvas");
@@ -13,13 +15,31 @@ canvas.height = innerHeight; // ocupar a tela inteira
 
 ctx.imageSmoothingEnabled = false;
 
+let currentState = GameState.PLAYING;
+
 const player = new Player(canvas.width, canvas.height);
 const grid = new Grid(3, 6); // colunas e linhas
 
 const playerProjectiles = [];
 const invaderProjectiles = [];
 const particles = [];
+const obstacles = [];
 
+const initobstacles = () => {
+    const x = canvas.width / 2 - 50;
+    const y = canvas.height - 250;
+    const offset = canvas.width * 0.15;
+    const color = "blue";
+
+    const obstacle1 = new Obstacle({ x: x - offset, y }, 150, 20, color);
+    const obstacle2 = new Obstacle({ x: x + offset, y }, 150, 20, color);
+
+    obstacles.push(obstacle1);
+    obstacles.push(obstacle2);
+
+}
+
+initobstacles();
 
 const keys = {
     left: false,
@@ -30,6 +50,10 @@ const keys = {
         realized: true,
     },
 };
+
+const drawnObstacles = () => {
+    obstacles.forEach((obstacle) => obstacle.draw(ctx));
+}
 
 const drawProjectiles = () => {
     const projectiles = [...playerProjectiles, ...invaderProjectiles]
@@ -56,19 +80,27 @@ const clearProjectiles = () => {
     });
 };
 
-const createExplosion = () => {
-    for (let i = 0; i < 10; i += 1) {
+const clearParticle = () => {
+    particles.forEach((particle, i) => {
+        if (particle.op <= 0) {
+            particle.splice(i, 1);
+        }
+    });
+};
+
+const createExplosion = (position, size, color) => {
+    for (let i = 0; i < size; i += 1) {
         const particle = new Particle(
             {
-                x: 300, // posicao
-                y: 500,
+                x: position.x, // posicao
+                y: position.y,
             },
             {
                 x: Math.random() - 0.5 * 1.5, // velocidade 
                 y: Math.random() - 0.5 * 1.5, // subtrai 0,5 pq ai d apra harmonizar e suavizar o efeito das particulas
             },
             2, // medida do raio
-            "crimson" // cor
+            color // cor
         );
         particles.push(particle);
 
@@ -82,7 +114,15 @@ const checkShootInvaders = () => {
         playerProjectiles.some((projectiles, projectileIndex) => {
             if (invader.Hit(projectiles)) {
 
-                createExplosion();
+                createExplosion(
+                    {
+                        x: invader.position.x + invader.width / 2,
+                        y: invader.position.y + invader.height / 2,
+
+                    },
+                    10,
+                    "crimson"
+                );
 
                 grid.invaders.splice(invaderIndex, 1);
                 playerProjectiles.splice(projectileIndex, 1);
@@ -92,53 +132,144 @@ const checkShootInvaders = () => {
     });
 };
 
+const checkShootPlayer = () => {
+    invaderProjectiles.some((projectile, i) => {
+        if (player.Hit(projectile)) {
+            invaderProjectiles.splice(i, 1);
+            gameOver();
+        }
+    });
+
+};
+
+const checkShootObstacle = () => {
+    obstacles.forEach((obstacle) => {
+        playerProjectiles.some((projectile, i) => {
+            if (obstacle.Hit(projectile)) {
+                playerProjectiles.splice(i, 1);
+            }
+        });
+
+        invaderProjectiles.some((projectile, i) => {
+            if (obstacle.Hit(projectile)) {
+                invaderProjectiles.splice(i, 1);
+            }
+        });
+    });
+};
+
+const spawnGrid = () => {
+    if (grid.invaders.length === 0) {
+        grid.rows = Math.round(Math.random() * 9 + 2);
+        grid.cols = Math.round(Math.random() * 9 + 2);
+        grid.Restart();
+    }
+};
+
+const gameOver = () => {
+    createExplosion({
+        x: player.position.x + player.width / 2,
+        y: player.position.y + player.height / 2,
+
+    },
+        10,
+        "white"
+    );
+
+    createExplosion({
+        x: player.position.x + player.width / 2,
+        y: player.position.y + player.height / 2,
+
+    },
+        10,
+        "#4D9be6"
+    );
+
+    createExplosion({
+        x: player.position.x + player.width / 2,
+        y: player.position.y + player.height / 2,
+
+    },
+        10,
+        "crimson"
+    );
+    currentState = GameState.GAME_OVER;
+    player.alive = false;
+}
+
+
 
 
 const gameloop = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height) // vai limpar a tela toda vez que atualizar
+    if (currentState == GameState.PLAYING) {
 
-    drawParticles();
-    drawProjectiles();
-    clearProjectiles();
+        spawnGrid();
 
-    checkShootInvaders();
+        drawProjectiles();
+        drawParticles();
+        drawnObstacles();
+
+        clearProjectiles();
+        clearParticle();
+
+        checkShootPlayer();
+        checkShootInvaders();
+        checkShootObstacle();
 
 
-    grid.draw(ctx);
-    // grid.update();
-    ctx.save();
+        grid.draw(ctx);
+        grid.update(player.alive);
 
-    ctx.translate(
-        player.position.x + player.width / 2,
-        player.position.y + player.height / 2
-    ); // centralizei o ponto de rotacao no meio do player para que n gire a tela inteira
+        ctx.save();
 
-    if (keys.shoot.pressed && keys.shoot.realized) {
-        player.shoot(playerProjectiles);
-        keys.shoot.realized = false;
-    };
+        ctx.translate(
+            player.position.x + player.width / 2,
+            player.position.y + player.height / 2
+        ); // centralizei o ponto de rotacao no meio do player para que n gire a tela inteira
 
-    if (keys.left && player.position.x >= 0) { // logica para n deixar o player sair da tela pela  esquerda
-        player.moveLeft();
-        ctx.rotate(-0.15);
+        if (keys.shoot.pressed && keys.shoot.realized) {
+            player.shoot(playerProjectiles);
+            keys.shoot.realized = false;
+        };
+
+        if (keys.left && player.position.x >= 0) { // logica para n deixar o player sair da tela pela  esquerda
+            player.moveLeft();
+            ctx.rotate(-0.15);
+        }
+
+        if (keys.right && player.position.x <= canvas.width - player.width) { // logica para n deixa o player sair da tela pela direita
+            player.moveRight();
+            ctx.rotate(+0.15);
+        }
+
+        ctx.translate(
+            - player.position.x - player.width / 2,
+            - player.position.y - player.height / 2
+        );
+
+
+        player.draw(ctx);
+
+        ctx.restore();
+
+
     }
+    if (currentState == GameState.GAME_OVER) {
+        checkShootObstacle();
+        drawParticles();
+        drawProjectiles();
+        drawnObstacles();
 
-    if (keys.right && player.position.x <= canvas.width - player.width) { // logica para n deixa o player sair da tela pela direita
-        player.moveRight();
-        ctx.rotate(+0.15);
+        clearProjectiles();
+        clearParticle();
+
+        grid.draw(ctx);
+        grid.update(player.alive);
     }
-
-    ctx.translate(
-        - player.position.x - player.width / 2,
-        - player.position.y - player.height / 2
-    );
+    requestAnimationFrame(gameloop);// atualiza a tela so quando necessario
 
 
-    player.draw(ctx);
-
-    ctx.restore();
-
-    requestAnimationFrame(gameloop) // atualiza a tela so quando necessario
 }
 
 
@@ -168,13 +299,13 @@ addEventListener("keyup", (event) => { // funcao para registras as teclas so que
     }
 });
 
-// setInterval(() => {
-//     const invader = grid.getRandomInvaderShoot()
+setInterval(() => {
+    const invader = grid.getRandomInvaderShoot()
 
-//     if (invader) {
-//         invader.shoot(invaderProjectiles);
-//     }
+    if (invader) {
+        invader.shoot(invaderProjectiles);
+    }
 
-// }, 1000);
+}, 1000);
 
 gameloop();

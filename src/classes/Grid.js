@@ -1,4 +1,4 @@
-import Invader from "./invader.js";
+import Invader from "./Invader.js";
 
 
 class Grid {
@@ -39,7 +39,7 @@ class Grid {
         this.invaders.forEach((invader) => invader.draw(ctx));
     }
 
-    update() {
+    update(playerStatus) {
 
         if (this.reachedRightBoundary()) {
             this.direction = "left";
@@ -50,6 +50,7 @@ class Grid {
             this.moveDown = true;
         }
 
+        if (!playerStatus) this.moveDown = false;
 
         this.invaders.forEach((invader) => {
             if (this.moveDown) {
@@ -77,6 +78,11 @@ class Grid {
     getRandomInvaderShoot(){
         const index = Math.floor(Math.random() * this.invaders.length);
         return this.invaders[index];
+    }
+
+    Restart(){
+        this.invaders = this.init();
+        this.direction = "right";
     }
 
 
