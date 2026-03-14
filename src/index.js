@@ -1,11 +1,22 @@
 import Grid from "./classes/Grid.js";
-import Invader from "./classes/Invader.js";
 import Obstacle from "./classes/Obstacle.js";
 import Particle from "./classes/particle.js";
 import Player from "./classes/Player.js";
-import Projectile from "./classes/Projectile.js";
+import SoundEffects from "./classes/SoundEffects.js";
 import { GameState } from "./utils/constanst.js";
 
+const soundEffects = new SoundEffects();
+
+const startScreen = document.querySelector(".start-screen");
+const gameOverScreen = document.querySelector(".game-over");
+const scoreUi = document.querySelector(".score-ui");
+const scoreElement = scoreUi.querySelector(".score > span");
+const levelElement = scoreUi.querySelector(".level > span");
+const highElement = scoreUi.querySelector(".high > span");
+const buttonPlay = document.querySelector(".button-play");
+const buttonRestart = document.querySelector(".button-restart");
+
+gameOverScreen.remove();
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
@@ -15,7 +26,19 @@ canvas.height = innerHeight; // ocupar a tela inteira
 
 ctx.imageSmoothingEnabled = false;
 
-let currentState = GameState.PLAYING;
+let currentState = GameState.START;
+
+const gameData = {
+    score: 0,
+    level: 1,
+    high: 0,
+};
+
+const showGameData = () => {
+    scoreElement.textContent = gameData.score;
+    levelElement.textContent = gameData.level;
+    highElement.textContent = gameData.high;
+};
 
 const player = new Player(canvas.width, canvas.height);
 const grid = new Grid(3, 6); // colunas e linhas
@@ -37,9 +60,17 @@ const initobstacles = () => {
     obstacles.push(obstacle1);
     obstacles.push(obstacle2);
 
-}
+};
 
 initobstacles();
+
+const incrementScore = (value) => {
+    gameData.score += value;
+
+    if(gameData.score > gameData.high){
+        gameData.high = gameData.score
+    }
+};
 
 const keys = {
     left: false,
@@ -114,6 +145,7 @@ const checkShootInvaders = () => {
         playerProjectiles.some((projectiles, projectileIndex) => {
             if (invader.Hit(projectiles)) {
 
+                soundEffects.playHitSound();
                 createExplosion(
                     {
                         x: invader.position.x + invader.width / 2,
@@ -123,6 +155,9 @@ const checkShootInvaders = () => {
                     10,
                     "crimson"
                 );
+
+                incrementScore(10);
+
 
                 grid.invaders.splice(invaderIndex, 1);
                 playerProjectiles.splice(projectileIndex, 1);
@@ -135,6 +170,7 @@ const checkShootInvaders = () => {
 const checkShootPlayer = () => {
     invaderProjectiles.some((projectile, i) => {
         if (player.Hit(projectile)) {
+            soundEffects.playExplosionSound();
             invaderProjectiles.splice(i, 1);
             gameOver();
         }
@@ -160,9 +196,12 @@ const checkShootObstacle = () => {
 
 const spawnGrid = () => {
     if (grid.invaders.length === 0) {
+        soundEffects.playNextLevelSound();
         grid.rows = Math.round(Math.random() * 9 + 2);
         grid.cols = Math.round(Math.random() * 9 + 2);
         grid.Restart();
+
+        gameData.level += 1;
     }
 };
 
@@ -195,7 +234,8 @@ const gameOver = () => {
     );
     currentState = GameState.GAME_OVER;
     player.alive = false;
-}
+    document.body.append(gameOverScreen);
+};
 
 
 
@@ -204,6 +244,7 @@ const gameloop = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height) // vai limpar a tela toda vez que atualizar
     if (currentState == GameState.PLAYING) {
 
+        showGameData();
         spawnGrid();
 
         drawProjectiles();
@@ -230,6 +271,7 @@ const gameloop = () => {
 
         if (keys.shoot.pressed && keys.shoot.realized) {
             player.shoot(playerProjectiles);
+            soundEffects.playShootSound();
             keys.shoot.realized = false;
         };
 
@@ -299,13 +341,37 @@ addEventListener("keyup", (event) => { // funcao para registras as teclas so que
     }
 });
 
-setInterval(() => {
-    const invader = grid.getRandomInvaderShoot()
 
-    if (invader) {
-        invader.shoot(invaderProjectiles);
-    }
 
-}, 1000);
+buttonPlay.addEventListener("click", () => {
+    startScreen.remove();
+    scoreUi.style.display = "block"
+    currentState = GameState.PLAYING;
+
+    setInterval(() => {
+        const invader = grid.getRandomInvaderShoot()
+
+        if (invader) {
+            invader.shoot(invaderProjectiles);
+        }
+
+    }, 1000);
+})
+
+
+buttonRestart.addEventListener("click", () => {
+    currentState = GameState.PLAYING;
+    player.alive = true;
+    grid.invaders.length = 0;
+    grid.invadersVelocity = 1;
+
+    invaderProjectiles.length = 0;
+
+    gameData.score = 0;
+    gameData.level = 0;
+
+    gameOverScreen.remove();
+});
+
 
 gameloop();

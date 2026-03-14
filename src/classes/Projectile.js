@@ -10,7 +10,7 @@ class Projectile {
     }
 awddddddda
     draw(ctx){
-        ctx.fillStyle = "white";
+        ctx.fillStyle = "orange";
         ctx.fillRect(
             this.position.x,
             this.position.y,

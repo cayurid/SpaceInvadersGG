@@ -9,5 +9,95 @@
 
 canvas {
 
-     background-color: black;
+    background-color: black;
+}
+
+.screen {
+    width: 100%;
+    height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: absolute;
+    color: white;
+    top: 0%;
+    left: 0%;
+
+}
+
+.screen h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.screen span {
+    font-size: 1rem;
+    color: #888;
+    margin-top: auto;
+    margin-bottom: 20px;
+    text-decoration: underline;
+}
+
+.start-screen>div {
+    margin-top: auto;
+}
+
+.button-play, .button-restart {
+    padding: 12px 20px;
+    background-color: #ddd;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    display: block;
+    margin: 20px auto 0;
+}
+.button-play:hover, .button-restart:hover {
+    background-color: #fff;
+}
+
+.game-over {
+    scale: 0;
+    animation: Zoom 1.5s ease-in-out forwards;
+}
+
+.score-ui {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    color: white;
+    font-size: 1rem;
+    text-align: center;
+    width: 100%;
+    text-transform: uppercase;
+    padding: 40px;
+    display: none;
+}
+
+.score-ui > div {
+   justify-content: space-between;
+    display: flex;
+    max-width: 600px;
+    margin: 0 auto ;
+}
+
+
+
+
+
+
+
+
+@keyframes Zoom {
+    from {
+        scale: 0;
+
+    }   /* da onde ta saindo */
+    to {
+        scale: 1;
+
+    } /* para onde esta indo */
+    
 }
