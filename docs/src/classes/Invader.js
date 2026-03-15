@@ -12,19 +12,23 @@ class Invader {
             this.height = 37 * 0.7;
             this.color  = "#00ffcc";
             this.points = 20;
+            this.hp     = 1;
         } else if (type === "tank") {
             this.width  = 50 * 1.1;
             this.height = 37 * 1.1;
             this.color  = "#ff4444";
             this.points = 30;
+            this.hp     = 2; // aguenta 2 tiros
         } else {
             this.width  = 50 * 0.8;
             this.height = 37 * 0.8;
             this.color  = "#ffffff";
             this.points = 10;
+            this.hp     = 1;
         }
 
-        this.image = this.getImage(PATH_INVADER_IMAGE);
+        this.image      = this.getImage(PATH_INVADER_IMAGE);
+        this.flashTimer = 0;
     }
 
     getImage(path) {
@@ -39,21 +43,32 @@ class Invader {
 
     incrementVelocity(boost) { this.velocity += boost; }
 
+    // retorna true se morreu
+    takeDamage() {
+        this.hp--;
+        this.flashTimer = 8;
+        return this.hp <= 0;
+    }
+
     draw(ctx) {
         ctx.save();
 
-        // diferencia os tipos apenas com brilho externo — sem overlay
         if (this.type === "fast") {
             ctx.shadowColor = "#00ffcc";
             ctx.shadowBlur  = 14;
         } else if (this.type === "tank") {
             ctx.shadowColor = "#ff4444";
             ctx.shadowBlur  = 14;
+            if (this.hp === 1) ctx.globalAlpha = 0.6; // indica dano
         }
-        // normal: sem brilho, sprite pura
+
+        if (this.flashTimer > 0) {
+            ctx.shadowColor = "white";
+            ctx.shadowBlur  = 20;
+            this.flashTimer--;
+        }
 
         ctx.drawImage(this.image, this.position.x, this.position.y, this.width, this.height);
-
         ctx.restore();
     }
 
