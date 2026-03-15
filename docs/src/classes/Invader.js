@@ -4,23 +4,23 @@ import Projectile from "./Projectile.js";
 class Invader {
     constructor(position, velocity, type = "normal") {
         this.position = position;
-        this.type = type;
+        this.type     = type;
         this.velocity = velocity;
 
         if (type === "fast") {
-            this.width = 50 * 0.7;
+            this.width  = 50 * 0.7;
             this.height = 37 * 0.7;
-            this.color = "#00ffcc";
+            this.color  = "#00ffcc";
             this.points = 20;
         } else if (type === "tank") {
-            this.width = 50 * 1.1;
+            this.width  = 50 * 1.1;
             this.height = 37 * 1.1;
-            this.color = "#ff4444";
+            this.color  = "#ff4444";
             this.points = 30;
         } else {
-            this.width = 50 * 0.8;
+            this.width  = 50 * 0.8;
             this.height = 37 * 0.8;
-            this.color = "#ffffff";
+            this.color  = "#ffffff";
             this.points = 10;
         }
 
@@ -28,49 +28,38 @@ class Invader {
     }
 
     getImage(path) {
-        const image = new Image();
-        image.src = path;
-        return image;
+        const img = new Image();
+        img.src = path;
+        return img;
     }
 
     moveLeft()  { this.position.x -= this.velocity; }
     moveRight() { this.position.x += this.velocity; }
-    moveDown()  { this.position.y += this.height; }
+    moveDown()  { this.position.y += this.height;   }
 
     incrementVelocity(boost) { this.velocity += boost; }
 
     draw(ctx) {
         ctx.save();
 
-        // brilho externo por tipo (nao afeta o visual da sprite)
+        // diferencia os tipos apenas com brilho externo — sem overlay
         if (this.type === "fast") {
             ctx.shadowColor = "#00ffcc";
-            ctx.shadowBlur = 12;
+            ctx.shadowBlur  = 14;
         } else if (this.type === "tank") {
             ctx.shadowColor = "#ff4444";
-            ctx.shadowBlur = 14;
+            ctx.shadowBlur  = 14;
         }
+        // normal: sem brilho, sprite pura
 
-        // desenha a sprite normal primeiro
         ctx.drawImage(this.image, this.position.x, this.position.y, this.width, this.height);
-
-        // coloracao so nos pixels da sprite (sem quadrado)
-        if (this.type !== "normal") {
-            ctx.globalCompositeOperation = "source-atop";
-            ctx.globalAlpha = 0.45;
-            ctx.fillStyle = this.color;
-            ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
-        }
 
         ctx.restore();
     }
 
     shoot(projectiles) {
         projectiles.push(new Projectile(
-            {
-                x: this.position.x + this.width / 2 - 1,
-                y: this.position.y + 10,
-            },
+            { x: this.position.x + this.width / 2 - 1, y: this.position.y + 10 },
             10,
             "invader"
         ));

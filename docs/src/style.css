@@ -8,8 +8,30 @@
 }
 
 canvas {
-
+    display: block;
     background-color: black;
+}
+
+.score-ui {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    color: white;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    padding: 14px 40px;
+    display: none;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.score-row {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    max-width: 700px;
+    margin: 0 auto;
 }
 
 .screen {
@@ -21,9 +43,9 @@ canvas {
     flex-direction: column;
     position: absolute;
     color: white;
-    top: 0%;
-    left: 0%;
-
+    top: 0;
+    left: 0;
+    z-index: 20;
 }
 
 .screen h1 {
@@ -32,18 +54,19 @@ canvas {
 }
 
 .screen span {
-    font-size: 1rem;
+    font-size: 0.8rem;
     color: #888;
     margin-top: auto;
     margin-bottom: 20px;
     text-decoration: underline;
 }
 
-.start-screen>div {
+.start-screen > div {
     margin-top: auto;
 }
 
-.button-play, .button-restart {
+.button-play,
+.button-restart {
     padding: 12px 20px;
     background-color: #ddd;
     border: none;
@@ -54,7 +77,9 @@ canvas {
     display: block;
     margin: 20px auto 0;
 }
-.button-play:hover, .button-restart:hover {
+
+.button-play:hover,
+.button-restart:hover {
     background-color: #fff;
 }
 
@@ -63,41 +88,7 @@ canvas {
     animation: Zoom 1.5s ease-in-out forwards;
 }
 
-.score-ui {
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    color: white;
-    font-size: 1rem;
-    text-align: center;
-    width: 100%;
-    text-transform: uppercase;
-    padding: 40px;
-    display: none;
-}
-
-.score-ui > div {
-   justify-content: space-between;
-    display: flex;
-    max-width: 600px;
-    margin: 0 auto ;
-}
-
-
-
-
-
-
-
-
 @keyframes Zoom {
-    from {
-        scale: 0;
-
-    }   /* da onde ta saindo */
-    to {
-        scale: 1;
-
-    } /* para onde esta indo */
-    
+    from { scale: 0; }
+    to   { scale: 1; }
 }
