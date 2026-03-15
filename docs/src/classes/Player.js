@@ -4,15 +4,13 @@ import Projectile from "./Projectile.js";
 class Player {
     constructor(canvasWidth, canvasHeight) {
         this.alive = true;
-        this.width = 48 * 3; // altura
-        this.height = 48 * 3; // largura // this ja instacia a variavel dentro do metodo
+        this.width = 48 * 3;
+        this.height = 48 * 3;
         this.velocity = 8;
 
         this.position = {
             x: canvasWidth / 2 - this.width / 2,
             y: canvasHeight - this.height - 30,
-
-
         };
 
         this.image = this.getImage(PATH_SPACESHIP_IMAGE);
@@ -21,7 +19,6 @@ class Player {
 
         this.sx = 0;
         this.framesCounter = INITIAL_FRAMES;
-
     }
 
     getImage(path) {
@@ -30,56 +27,22 @@ class Player {
         return image;
     }
 
-
-    moveLeft() {
-
-        this.position.x -= this.velocity;
-    }
-    moveRight() {
-
-        this.position.x += this.velocity;
-    }
-   
-
+    moveLeft()  { this.position.x -= this.velocity; }
+    moveRight() { this.position.x += this.velocity; }
 
     draw(ctx) {
-        // a ordem importa na hora de desenhar, primeiro a nave dps o motor, se for ao contrario o motor fica por baixo
-
-
-        ctx.drawImage(
-            this.image,
-            this.position.x,
-            this.position.y,
-            this.width,
-            this.height
-        );
-
+        ctx.drawImage(this.image, this.position.x, this.position.y, this.width, this.height);
         ctx.drawImage(
             this.engineSprites,
-            this.sx, 0, // source x 0, source y = 0,  e o caminho fonte da onde queremos buscar a imagem
-            48, 48, // ele que saber o tamanho orginal do arquivo= extrair um  48 x 48 da imagem original
-            this.position.x, // posicionar  a imagem
-            this.position.y + 12,
-            this.width,
-            this.height
+            this.sx, 0, 48, 48,
+            this.position.x, this.position.y + 12,
+            this.width, this.height
         );
-
-
-        ctx.drawImage(
-            this.engineImage,
-            this.position.x,
-            this.position.y + 10,
-            this.width,
-            this.height
-        );
-
+        ctx.drawImage(this.engineImage, this.position.x, this.position.y + 10, this.width, this.height);
         this.update();
-
-
     }
 
     update() {
-
         if (this.framesCounter === 0) {
             this.sx = this.sx === 96 ? 0 : this.sx + 48;
             this.framesCounter = INITIAL_FRAMES;
@@ -88,30 +51,24 @@ class Player {
     }
 
     shoot(projectiles) {
-        const p = new Projectile(
+        projectiles.push(new Projectile(
             {
-                x: this.position.x + this.width / 2 - 1,
+                x: this.position.x + this.width / 2,
                 y: this.position.y + 10,
             },
-            -10 // velocidade
-
-        );
-        projectiles.push(p);
+            -10,
+            "player"
+        ));
     }
 
-    Hit(projectiles){
+    Hit(projectile) {
         return (
-            projectiles.position.x >= this.position.x + 20 && 
-            projectiles.position.x <= this.position.x + 20 + this.width - 38 &&
-            projectiles.position.y >= this.position.y + 22 &&
-            projectiles.position.y <= this.position.y + 22 + this.height - 34
-
+            projectile.position.x >= this.position.x + 20 &&
+            projectile.position.x <= this.position.x + 20 + this.width - 38 &&
+            projectile.position.y >= this.position.y + 22 &&
+            projectile.position.y <= this.position.y + 22 + this.height - 34
         );
-            
     }
-
 }
 
-
-
-export default Player; // poder exportar e utlizar essa classe = Heranca
+export default Player;
