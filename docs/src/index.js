@@ -161,6 +161,16 @@ const checkShootPlayer = () => {
     });
 };
 
+const checkInvaderReachPlayer = () => {
+    grid.invaders.some((invader) => {
+        if (player.HitByInvader(invader)) {
+            soundEffects.playExplosionSound();
+            gameOver();
+            return true;
+        }
+    });
+};
+
 const checkShootObstacle = () => {
     obstacles.forEach((obstacle) => {
         playerProjectiles.some((p, i) => { if (obstacle.Hit(p)) playerProjectiles.splice(i, 1); });
@@ -199,16 +209,21 @@ const gameloop = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (currentState === GameState.PLAYING) {
+
         showGameData();
+
         drawProjectiles();
         drawParticles();
         drawnObstacles();
+
         clearProjectiles();
         clearParticle();
+        
         checkShootPlayer();
         checkShootInvaders();
         checkShootBoss();
         checkShootObstacle();
+        checkInvaderReachPlayer();
 
         if (!bossActive) {
             spawnGrid();

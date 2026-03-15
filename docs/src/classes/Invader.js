@@ -42,18 +42,22 @@ class Invader {
     draw(ctx) {
         ctx.save();
 
+        // brilho externo por tipo (nao afeta o visual da sprite)
         if (this.type === "fast") {
             ctx.shadowColor = "#00ffcc";
-            ctx.shadowBlur = 8;
+            ctx.shadowBlur = 12;
         } else if (this.type === "tank") {
             ctx.shadowColor = "#ff4444";
-            ctx.shadowBlur = 10;
+            ctx.shadowBlur = 14;
         }
 
+        // desenha a sprite normal primeiro
         ctx.drawImage(this.image, this.position.x, this.position.y, this.width, this.height);
 
+        // coloracao so nos pixels da sprite (sem quadrado)
         if (this.type !== "normal") {
-            ctx.globalAlpha = 0.35;
+            ctx.globalCompositeOperation = "source-atop";
+            ctx.globalAlpha = 0.45;
             ctx.fillStyle = this.color;
             ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
         }
@@ -62,15 +66,14 @@ class Invader {
     }
 
     shoot(projectiles) {
-        const p = new Projectile(
+        projectiles.push(new Projectile(
             {
                 x: this.position.x + this.width / 2 - 1,
                 y: this.position.y + 10,
             },
             10,
             "invader"
-        );
-        projectiles.push(p);
+        ));
     }
 
     Hit(projectile) {
