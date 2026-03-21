@@ -2,19 +2,6 @@
 
 > Um clone moderno e expansivo do clássico Space Invaders, construído do zero com JavaScript Vanilla e Canvas API.
 
-<div align="center">
-
-![Game Preview](docs/src/assets/images/fundo.jpg)
-
-[![Play Now](https://img.shields.io/badge/🎮_Jogar_Agora-GitHub_Pages-success?style=for-the-badge)](https://seu-usuario.github.io/SpaceInvadersGG)
-[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![Canvas API](https://img.shields.io/badge/Canvas_API-HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API)
-[![GitHub Pages](https://img.shields.io/badge/Deploy-GitHub_Pages-181717?style=for-the-badge&logo=github)](https://pages.github.com/)
-
-</div>
-
----
-
 ## 🎮 Sobre o Projeto
 
 SpaceInvadersGG é uma reimaginação moderna do icônico arcade Space Invaders de 1978. O jogo foi desenvolvido inteiramente com **JavaScript Vanilla** e **Canvas API**, sem nenhuma biblioteca ou engine externa — apenas código puro.
